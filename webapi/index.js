@@ -32,24 +32,26 @@ app.get('/clientes/:id?', (req, res) => {
 });
 
 app.delete('/clientes/:id', (req, res) =>{
-    let query = 'DELETE FROM Clientes WHERE ID=' + parseInt(req.params.id);
-    connection.query(query, (err, rows, fields) => {
+    const query = "DELETE FROM Clientes WHERE ID=?";
+    let id_ = parseInt(req.params.id);
+    connection.query(query, [id_], (err, rows, fields) => {
         if (err) throw err
         res.json(rows);
-    })
+    });
+    // curl --header "Content-Type: application/json" --request DELETE http://localhost:3000/clientes/12
 });
 
 app.post('/clientes', (req, res) => {
     console.log(req.body);
     const nome = req.body.nome.substring(0,150);
     const cpf = req.body.cpf.substring(0,11);
-    let query = `INSERT INTO Clientes(Nome, CPF) VALUES('${nome}','${cpf}')`;
+    const query = "INSERT INTO Clientes(Nome, CPF) VALUES(?,?)";
 
-    connection.query(query, (err, rows, fields) => {
+    connection.query(query, [nome, cpf], (err, rows, fields) => {
         if (err) throw err
         res.json(rows);
     });
-    // curl --header "Content-Type: application/json" --request POST --data '{"nome":"marcos","cpf":"00998877662233"}' http://localhost:3000/clientes
+    // curl --header "Content-Type: application/json" --request POST --data '{"nome":"fabiana","cpf":"11223344556677"}' http://localhost:3000/clientes
 });
 
 app.patch('/clientes', (req, res) => {
@@ -57,11 +59,11 @@ app.patch('/clientes', (req, res) => {
     const id = parseInt(req.body.id);
     const nome = req.body.nome.substring(0,150);
     const cpf = req.body.cpf.substring(0,11);
-    let query = `UPDATE Clientes SET Nome='${nome}', CPF='${cpf}' WHERE ID=${id}`;
-    connection.query(query, (err, rows, fields) => {
+    const query = "UPDATE Clientes SET Nome=?, CPF=? WHERE ID=?";
+    connection.query(query, [nome, cpf, id], (err, rows, fields) => {
         if (err) throw err
         res.json(rows);
     });
 
-    // curl --header "Content-Type: application/json" --request PATCH --data '{"id": 10, "nome":"rejane","cpf":"00998877662233"}' http://localhost:3000/clientes
+    // curl --header "Content-Type: application/json" --request PATCH --data '{"id": 10, "nome":"marcos","cpf":"00998877662233"}' http://localhost:3000/clientes
 });
